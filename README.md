@@ -14,7 +14,7 @@ Contains 1 Arduino terminal program example to do all commands the RS-HFIQ suppo
 
 In theory this should also permit control via Omni-Rig2 interface from PC or Linux SDR programs because the serial interface will accept all commands in the same format the RS-HFIQ accepts. (Not tested yet)
 
-Tis version uses an internal band map table that ensures any serial terminal request frequency is within the band limits.  Invalid requests are ignored and returns a value of 0 to the caller.  Otherwise it retunsdd the new valid frequency and a band number.  The band number is useful for forcing updates on band changes when multiple VFOs are involved.
+This version uses an internal band map table that ensures any serial terminal request frequency is within the band limits.  Invalid requests are ignored and returns a value of 0 to the caller.  Otherwise it returns the new valid frequency and a band number.  The band number is useful for forcing updates on band changes when multiple VFOs are involved.  Can do your own band number lookup based on the returned frequency and ignore the one supplied. 
 
 Known Issues:
 The B, D and E set frequency offset commands need more work.
