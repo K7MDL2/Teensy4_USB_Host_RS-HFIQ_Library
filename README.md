@@ -10,7 +10,9 @@ You can see how I use this library in my Teensy SDR by searching my SDR_887x cod
 
 Uses the Teensy 4 CPU USB host port. The RS-HFIQ uses 150ma over that USB host port so you need a decent 5V supply to account for this.
 
-Contains 1 Arduino terminal program example to do all commands the RS-HFIQ supports.  It is not yet using the new library, it was the test program used to figure out how it all worked.
+Contains 2 Arduino terminal program examples to do all commands the RS-HFIQ supports. O
+a. SDR_RSHFIQ_.ino was the test program used to figure out how it all worked and is self-contained.  
+b. SDR_RSHFIQ_Lib.ino shows how to use the library.
 
 In theory this should also permit control via Omni-Rig2 interface from PC or Linux SDR programs because the serial interface will accept all commands in the same format the RS-HFIQ accepts. (Not tested yet)
 
