@@ -26,6 +26,7 @@ class SDR_RS_HFIQ
         char *      convert_freq_to_Str(uint32_t freq);
         void        send_fixed_cmd_to_RSHFIQ(const char * str);
         uint32_t    find_new_band(uint32_t new_frequency, uint8_t * rs_curr_band);
+        void        print_RSHFIQ(int flag);
         
     private:  
         char freq_str[15] = "7074000";  // *Fxxxx command to set LO freq, PLL Clock 0
@@ -45,7 +46,6 @@ class SDR_RS_HFIQ
         const char q_clip_on[3]       = "*C";     // clipping occuring, add external attenuation
         const char q_BIT_freq[4]      = "*B?";    // Built In Test. Uses PLL clock 2        // Internal band validation.  Can be bypassed for any frequency if desired in the code.
             
-        void print_RSHFIQ(int flag);
         bool refresh_RSHFIQ(void);
         void disp_Menu(void);
         void init_PLL(void);
