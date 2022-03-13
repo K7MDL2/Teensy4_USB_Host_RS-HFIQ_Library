@@ -1,7 +1,7 @@
 //***************************************************************************************************
 //
 //    SDR_RSHFIQ.INO
-//    TEST program
+//    Standalone TEST program - does not use the library yet.
 //    USB host test program for RS-HFIQ transciever board
 //    March 5, 2022 by K7MDL
 //    Based on the Teensy 3.6/4.x USBHost.ino example and RS-HFIQ.ino code
