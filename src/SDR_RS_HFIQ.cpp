@@ -3,6 +3,8 @@
 //      SDR_RS_HFIQ.cpp 
 //
 //      USB host control for RS-HFIQ 5W transciever board
+//      USB Host comms portion from the Teensy4 USBHost_t36 example program
+//      Requires Teensy 4.0 or 4.1 with USB Host port connector.
 //
 //      Placed in the Public Domain
 //
@@ -25,14 +27,6 @@ USBHIDParser hid3(RSHFIQ);
 static uint32_t rs_freq;
 int  counter  = 0;
 int  blocking = 1;  // 0 means do not wait for serial response from RS-HFIQ - for testing only.  1 is normal
-
-// External program stuff uique to the calling program.  Move this into the class init.
-//extern uint32_t VFOA;  // 0 value should never be used more than 1st boot before EEPROM since init should read last used from table.
-//extern uint32_t VFOB;
-//extern uint8_t  curr_band;   // global tracks our current band setting.
-///extern struct   Band_Memory bandmem[];
-//extern void     displayFreq();
-
 
 // There is now two versions of the USBSerial class, that are both derived from a common Base class
 // The difference is on how large of transfers that it can handle.  This is controlled by

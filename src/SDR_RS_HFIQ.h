@@ -12,8 +12,53 @@
 
 #include <Arduino.h>
 
-// ToDo: pass the band edges in fucntion args and remvoe this extern
+// ToDo: pass the band edges in function args and remove this extern call
 extern uint32_t find_new_band(uint32_t new_frequency);  // lookup function in main pgrogam for band edge validation, returns valid freq to keep in band or 0;
+
+/*
+//  Here is an example of the external band limit validation taken from my SDR_RA8875 program (found in Controls.cpp).
+//  Your version of this wodu reside in the main program.  I am looking to make an internal table with defaults that 
+//    can be overwritten by a new util;ity function.
+//  Uses a table of band information which includes upper and lower frequencies for each band.  
+//  If a band change is detected it calls changeBands(0) to apply the newly set VFO freqency (A or B which ever is active).
+//  If any other serial command is supplied from the terminal it is skipped.
+//  If the VFO is changed but the band remains the same, the changeBands(0) is skipped but the VFOs are updates and displayed.
+
+
+// For RS-HFIQ free-form frequency entry validation but can be useful for external program CAT control such as a logger program.
+// Changes to the correct band settings for the new target frequency.  
+// The active VFO will become the new frequency, the other VFO will come from the database last used frequency for that band.
+// If the new frequency is below or above the band limits it returns a value of 0 and skips any updates.
+//
+uint32_t find_new_band(uint32_t new_frequency)
+{
+    int i;
+
+    for (i=BAND10; i> BAND1; i--)    // start at the top and look for first band that VFOA fits under bandmem[i].edge_upper
+    {
+        if (new_frequency >= bandmem[i].edge_lower && new_frequency <= bandmem[i].edge_upper)  // found a band lower than new_frequency so search has ended
+        {
+            //Serial.print("Edge_Lower = "); Serial.println(bandmem[i].edge_lower);
+            curr_band = bandmem[i].band_num;
+            if (bandmem[curr_band].VFO_AB_Active == VFO_A)
+            {
+                VFOA = bandmem[curr_band].vfo_A_last = new_frequency;  // up the last used frequencies
+                VFOB = bandmem[curr_band].vfo_B_last;
+            }
+            else
+            {
+                VFOA = bandmem[curr_band].vfo_A_last;
+                VFOB = bandmem[curr_band].vfo_B_last = new_frequency;
+            }
+            //Serial.print("New Band = "); Serial.println(curr_band);
+            //changeBands(0);
+            return new_frequency;
+        }
+    }
+    Serial.println("Invalid Frequency Requested");
+    return 0;
+}
+*/
 
 class SDR_RS_HFIQ
 {
