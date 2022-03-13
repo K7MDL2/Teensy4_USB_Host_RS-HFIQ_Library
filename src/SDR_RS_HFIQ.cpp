@@ -30,6 +30,26 @@ static uint32_t rs_freq;
 int  counter  = 0;
 int  blocking = 1;  // 0 means do not wait for serial response from RS-HFIQ - for testing only.  1 is normal
 
+#define RS_BANDS    9
+struct RS_Band_Memory {
+    uint8_t     band_num;        // Assigned bandnum for compat with external program tables
+    char        band_name[10];  // Friendly name or label.  Default here but can be changed by user.  Not actually used by code.
+    uint32_t    edge_lower;     // band edge limits for TX and for when to change to next band when tuning up or down.
+    uint32_t    edge_upper;
+};
+
+struct RS_Band_Memory rs_bandmem[RS_BANDS] = {
+    {  1, "80M", 3500000, 4000000},
+    {  2, "60M", 4990000, 5367000},  // expanded to include coverage to lower side of WWV
+    {  3, "40M", 7000000, 7300000},
+    {  4, "30M", 9990000,10150000},  // expanded to include coverage to lower side of WWV
+    {  5, "20M",14000000,14350000},
+    {  6, "17M",18068000,18168000},
+    {  7, "15M",21000000,21450000},
+    {  8, "12M",24890000,24990000},
+    {  9, "10M",28000000,29600000}
+};
+
 // There is now two versions of the USBSerial class, that are both derived from a common Base class
 // The difference is on how large of transfers that it can handle.  This is controlled by
 // the device descriptor, where up to now we handled those up to 64 byte USB transfers.
@@ -102,7 +122,7 @@ void SDR_RS_HFIQ::setup_RSHFIQ(int _blocking, uint32_t VFO)  // 0 non block, 1 b
     disp_Menu();
 }
 
-uint32_t SDR_RS_HFIQ::cmd_console(uint32_t VFO)  // active VFOA value to possible change, returns new or unchanged VFO value
+uint32_t SDR_RS_HFIQ::cmd_console(uint32_t VFO, uint8_t * rs_curr_band)  // active VFOA value to possible change, returns new or unchanged VFO value
 {
     char c;
     unsigned char Ser_Flag = 0, Ser_NDX = 0;
@@ -186,14 +206,13 @@ uint32_t SDR_RS_HFIQ::cmd_console(uint32_t VFO)  // active VFOA value to possibl
             // convert string to number and update the rs_freq variable
             rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number   
             if (S_Input[0] == 'F')
-                rs_freq = find_new_band(rs_freq);  // set the correct index and changeBands() to match for possible band change
+                rs_freq = find_new_band(rs_freq, rs_curr_band);  // set the correct index and changeBands() to match for possible band change
             if (rs_freq == 0)
-                {
-                    Serial.print(F("RS-HFIQ: Invalid Frequency = ")); Serial.println(S_Input);
-                    Ser_Flag = 0;
-                    return rs_freq;
-                }
-            //update_VFOs(rs_freq);
+            {
+                Serial.print(F("RS-HFIQ: Invalid Frequency = ")); Serial.println(S_Input);
+                Ser_Flag = 0;
+                return rs_freq;
+            }
             Serial.print(F("RS_HFIQ Frequency Change: ")); Serial.println(rs_freq);
             send_variable_cmd_to_RSHFIQ(s_freq, convert_freq_to_Str(rs_freq));    
         }
@@ -348,4 +367,26 @@ bool SDR_RS_HFIQ::refresh_RSHFIQ(void)
     return Proceed;
 }
 
-//#endif // RS_HFIQ
+// For RS-HFIQ free-form frequency entry validation but can be useful for external program CAT control such as a logger program.
+// Changes to the correct band settings for the new target frequency.  
+// The active VFO will become the new frequency, the other VFO will come from the database last used frequency for that band.
+// If the new frequency is below or above the band limits it returns a value of 0 and skips any updates.
+//
+uint32_t SDR_RS_HFIQ::find_new_band(uint32_t new_frequency, uint8_t * rs_curr_band)
+{
+    int i;
+
+    for (i=RS_BANDS; i>=0; i--)    // start at the top and look for first band that VFOA fits under bandmem[i].edge_upper
+    {
+        if (new_frequency >= rs_bandmem[i].edge_lower && new_frequency <= rs_bandmem[i].edge_upper)  // found a band lower than new_frequency so search has ended
+        {
+            //Serial.print("Edge_Lower = "); Serial.println(rs_bandmem[i].edge_lower);
+            *rs_curr_band = rs_bandmem[i].band_num;
+            Serial.print("New Band = "); Serial.println(*rs_curr_band);
+            return new_frequency;
+        }
+    }
+    Serial.println("Invalid Frequency Requested");
+    return 0;  // 0 means frequency was not found in the table
+}
+
