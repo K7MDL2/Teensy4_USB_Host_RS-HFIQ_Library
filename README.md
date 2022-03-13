@@ -16,6 +16,8 @@ In theory this should also permit control via Omni-Rig2 interface from PC or Lin
 
 This version uses an internal band map table that ensures any serial terminal request frequency is within the band limits.  Invalid requests are ignored and returns a value of 0 to the caller.  Otherwise it returns the new valid frequency and a band number.  The band number is useful for forcing updates on band changes when multiple VFOs are involved.  Can do your own band number lookup based on the returned frequency and ignore the one supplied. 
 
+The initialization process has some pecularities that have been worked out by trial and error.  The library and now the test program now both share the same startup code which has shown to be reliable.
+
 Known Issues:
 The B, D and E set frequency offset commands need more work.
 
