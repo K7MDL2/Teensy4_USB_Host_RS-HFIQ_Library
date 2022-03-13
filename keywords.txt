@@ -1,0 +1,13 @@
+SDR_RS_HFIQ				KEYWORD1
+cmd_console 			KEYWORD2
+setup_RSHFIQ 			KEYWORD2
+print_RSHFIQ			KEYWORD3
+refresh_RSHFIQ			KEYWORD3
+send_fixed_cmd_to_RSHFIQ	KEYWORD3
+disp_Menu 				KEYWORD3
+send_variable_cmd_to_RSHFIQ 	KEYWORD3
+init_PLL 				KEYWORD3
+wait_reply				KEYWORD3
+convert_freq_to_Str 		KEYWORD3
+update_VFOs 			KEYWORD3
+		
