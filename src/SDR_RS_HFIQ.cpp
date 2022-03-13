@@ -2,6 +2,8 @@
 //
 //      SDR_RS_HFIQ.cpp 
 //
+//      March 12, 2022 by K7MDL
+//
 //      USB host control for RS-HFIQ 5W transciever board
 //      USB Host comms portion from the Teensy4 USBHost_t36 example program
 //      Requires Teensy 4.0 or 4.1 with USB Host port connector.
