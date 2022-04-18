@@ -174,6 +174,7 @@ uint32_t SDR_RS_HFIQ::cmd_console(uint32_t VFO, uint8_t * rs_curr_band)  // acti
                 case '8': Serial.print(F("Query Temp: ")); send_fixed_cmd_to_RSHFIQ(q_Temp); print_RSHFIQ(blocking); break;
                 case '9': Serial.println(F("Initialize PLL Clock0 (LO)")); send_fixed_cmd_to_RSHFIQ(s_initPLL); break;
                 case '0': Serial.print(F("Query Clipping: ")); send_fixed_cmd_to_RSHFIQ(q_clip_on); print_RSHFIQ(blocking); break;
+                case '?': Serial.print(F("Query Device Name: ")); send_fixed_cmd_to_RSHFIQ(q_dev_name); print_RSHFIQ(blocking); break;
                 case 'K': Serial.println(F("Move Down 1000Hz ")); fr_adj = -1000; break;
                 case 'L': Serial.println(F("Move Up 1000Hz ")); fr_adj = 1000; break;
                 case '<': Serial.println(F("Move Down 100Hz ")); fr_adj = -100; break;
@@ -199,31 +200,51 @@ uint32_t SDR_RS_HFIQ::cmd_console(uint32_t VFO, uint8_t * rs_curr_band)  // acti
     if (Ser_Flag == 3) 
     {
         Serial.print(F("Send Cmd String : *"));Serial.println(S_Input);  
-        if ((S_Input[0] == 'F' || S_Input[0] == 'D' || S_Input[0] == 'E') && S_Input[1] != '?') // Some commands do not issue a response
-                                                                                                // so do not do a blocking print that waits
-                                                                                                // for a response that will never come.
+        if (S_Input[0] == 'F' && S_Input[1] != '?')
         {
             // convert string to number and update the rs_freq variable
             rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number   
-            if (S_Input[0] == 'F')
-                rs_freq = find_new_band(rs_freq, rs_curr_band);  // set the correct index and changeBands() to match for possible band change
+            rs_freq = find_new_band(rs_freq, rs_curr_band);  // set the correct index and changeBands() to match for possible band change
             if (rs_freq == 0)
             {
                 Serial.print(F("RS-HFIQ: Invalid Frequency = ")); Serial.println(S_Input);
                 Ser_Flag = 0;
                 return rs_freq;
             }
-            Serial.print(F("RS_HFIQ Frequency Change: ")); Serial.println(rs_freq);
-            send_variable_cmd_to_RSHFIQ(s_freq, convert_freq_to_Str(rs_freq));    
-        }
-        else
+            send_variable_cmd_to_RSHFIQ(s_freq, convert_freq_to_Str(rs_freq));   
+            Serial.print(F("RS_HFIQ Frequency Change: ")); Serial.println(rs_freq);           
+        }    
+
+        if (S_Input[0] == 'B' && S_Input[1] != '?')
         {
-          Serial.print(F("RS_HFIQ Command: ")); Serial.println(S_Input);
-          send_fixed_cmd_to_RSHFIQ(S_Input);
-          delay(5);
-          print_RSHFIQ(0);  // do not print this for freq changes, causes a hang since there is no response and this is a blocking call 
-                            // Use non blocking since user input could be in error and a response may not be returned
+            // convert string to number  
+            rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number
+            send_variable_cmd_to_RSHFIQ(s_BIT_freq, convert_freq_to_Str(rs_freq));
+            Serial.print(F("Set BIT Frequency (Hz): ")); Serial.println(convert_freq_to_Str(rs_freq));
+            return rs_freq;
         }
+        if (S_Input[0] == 'D' && S_Input[1] != '?')
+        {
+            // convert string to number  
+            rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number
+            send_variable_cmd_to_RSHFIQ(s_F_Offset, convert_freq_to_Str(rs_freq));
+            Serial.print(F("Set Offset Frequency (Hz): ")); Serial.println(convert_freq_to_Str(rs_freq));
+            return rs_freq;
+        }
+        if (S_Input[0] == 'E' && S_Input[1] != '?')
+        {
+            // convert string to number  
+            rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number
+            send_variable_cmd_to_RSHFIQ(s_EXT_freq, convert_freq_to_Str(rs_freq));
+            Serial.print(F("Set External Frequency (Hz): ")); Serial.println(convert_freq_to_Str(rs_freq));
+            return rs_freq;
+        }
+        // must be a query
+        Serial.print(F("RS_HFIQ Command: ")); Serial.println(S_Input);
+        send_fixed_cmd_to_RSHFIQ(S_Input);
+        delay(5);
+        print_RSHFIQ(0);  // do not print this for freq changes, causes a hang since there is no response and this is a blocking call 
+                          // Use non blocking since user input could be in error and a response may not be returned
         Ser_Flag = 0;
     }
     return rs_freq;
@@ -304,6 +325,7 @@ void SDR_RS_HFIQ::disp_Menu(void)
     Serial.println(F(" 8 - Query Temp"));
     Serial.println(F(" 9 - Initialize PLL Clock0 (LO)"));
     Serial.println(F(" 0 - Query Clipping"));
+    Serial.println(F(" ? - Query Device Name"));
     
     Serial.println(F("\n Can use upper or lower case letters"));
     Serial.println(F(" Can use multiple frequency shift actions such as "));

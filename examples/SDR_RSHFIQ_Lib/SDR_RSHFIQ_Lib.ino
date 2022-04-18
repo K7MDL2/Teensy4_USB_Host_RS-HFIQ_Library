@@ -1,10 +1,10 @@
 //***************************************************************************************************
 //
 //    SDR_RSHFIQ_Lib.INO
-//    Standalone Teensy 4 USB Host test program for RS-HFIQ transciever board
+//    Standalone Teensy 4 USB Host test program for RS-HFIQ transceiver board
 //    Shows how to use the Teensy4_USBHost_RS-HFIQ_Library
 //
-//    March 13, 2022 by K7MDL
+//    April 18, 2022 by K7MDL
 //
 //    Based on the Teensy 3.6/4.x USBHost.ino example and RS-HFIQ.ino code
 //    Test set and query commands for the RS-HFIQ transceiver via the Teensy 4.x USB Host serial port.
@@ -37,7 +37,7 @@ int         block = 1;
 void setup()
 {
     while (!Serial && (millis() < 5000)) ;      // wait for Arduino Serial Monitor
-    Serial.println("\n\nRS-HFIQ Teensy USB Host Port Library Test Program V1.0");
+    Serial.println("\n\nRS-HFIQ Teensy USB Host Port Library Test Program V1.1");
     
     // Something to do other than the RS-HFIQ for the Main Menu
     InternalTemperature.begin(TEMPERATURE_NO_ADC_SETTING_CHANGES);
@@ -169,13 +169,12 @@ void respondToByte(char c)
     char s[2];
     s[0] = c;
     s[1] = 0;
-    if (!isalpha(c) && c != '?' && c != '*')
-        return;
+    //if (!isalpha(c) && c != '?' && c != '*')
+    //    return;
     switch (c)
     {
     case 'h':
-    case 'H':
-    case '?':   printHelp();
+    case 'H':   printHelp();
                 break;
     case 'C':
     case 'c':   Serial.println(F("Toggle printing CPU temperature."));
