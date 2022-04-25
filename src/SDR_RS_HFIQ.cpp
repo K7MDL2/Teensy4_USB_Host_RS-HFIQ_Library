@@ -2,11 +2,16 @@
 //
 //      SDR_RS_HFIQ.cpp 
 //
-//      April 23, 2022 by K7MDL
+//      April 24, 2022 by K7MDL
 //
 //      USB host control for RS-HFIQ 5W transciever board
 //      USB Host comms portion from the Teensy4 USBHost_t36 example program
 //      Requires Teensy 4.0 or 4.1 with USB Host port connector.
+//
+//      Accepts expanded set of CAT port commands such as *FA, *FB, *SW0, etc. fo OmniRig control
+//          and passes back these controls to the main program.  
+//      A Custom rig file is part of the GitHub project files for the Teensy SDR project under user K7MDL2
+//          at https://github.com/K7MDL2/KEITHSDR/tree/main/SDR_RA8875/RS-HFIQ%20Omni-RIg
 //
 //      Placed in the Public Domain
 //
@@ -74,7 +79,6 @@ void SDR_RS_HFIQ::setup_RSHFIQ(int _blocking, uint32_t VFO)  // 0 non block, 1 b
 {   
     Serial.println("Start of RS-HFIQ Setup");
     rs_freq = VFO;
-    //blocking = _blocking;
     blocking = _blocking;
     Serial.println(F("\n\nUSB Host Testing - Serial"));
     RSHFIQ.begin();
@@ -132,18 +136,19 @@ void SDR_RS_HFIQ::setup_RSHFIQ(int _blocking, uint32_t VFO)  // 0 non block, 1 b
 // The RS-HFIQ has only 1 "VFO" so does not itself care about VFO A or B or split, or which is active
 // However this is also the CAT interface and commands will come down for such things.  
 // We need to act on the active VFO and pass back the info needed to the calling program.
-uint32_t SDR_RS_HFIQ::cmd_console(uint8_t * active_vfo, uint32_t * VFOA, uint32_t * VFOB, uint8_t * rs_curr_band, uint8_t * xmit, uint8_t * split)  // returns new or unchanged active VFO value
+uint32_t SDR_RS_HFIQ::cmd_console(uint8_t * swap_vfo, uint32_t * VFOA, uint32_t * VFOB, uint8_t * rs_curr_band, uint8_t * xmit, uint8_t * split)  // returns new or unchanged active VFO value
 {
     char c;
     static unsigned char Ser_Flag = 0, Ser_NDX = 0;
-    static uint8_t vfo_ab_last = 0;
+    static uint8_t swap_vfo_last = 0;
 
-    if (active_vfo)
+    //if (active_vfo)
         rs_freq = *VFOA;
-    else
-        rs_freq = *VFOB;
+    //else
+    //    rs_freq = *VFOB;
 
-/*   Test code.  Passes through all chars both directions.
+//   Test code.  Passes through all chars both directions.
+/*
     while (Serial.available() > 0)    // Process any and all characters in the buffer
         userial.write(Serial.read());
     while (userial.available()) 
@@ -239,7 +244,7 @@ uint32_t SDR_RS_HFIQ::cmd_console(uint8_t * active_vfo, uint32_t * VFOA, uint32_
             else
             {
                 // convert string to number and update the rs_freq variable
-                rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number   
+                *VFOA = rs_freq = atoi(&S_Input[1]);   // skip the first letter 'F' and convert the number   
                 sprintf(freq_str, "%8s", &S_Input[1]);
                 Serial.print("RS-HFIQ: Active VFO = ");
                 Serial.println(freq_str);
@@ -309,14 +314,14 @@ uint32_t SDR_RS_HFIQ::cmd_console(uint8_t * active_vfo, uint32_t * VFOA, uint32_
             *xmit = 1;
             return 1;
         }
-        if (!strcmp(S_Input, "S0"))
+        if (!strcmp(S_Input, "SW0"))
         {
-            if (vfo_ab_last)
-                vfo_ab_last = 0;
+            if (swap_vfo_last)
+                swap_vfo_last = 0;
             else 
-                vfo_ab_last = 1;
-            *active_vfo = vfo_ab_last;
-            Serial.print(F("RS-HFIQ: Swap VFOs: "));Serial.println(*active_vfo);
+                swap_vfo_last = 1;
+            *swap_vfo = swap_vfo_last;
+            Serial.print(F("RS-HFIQ: Swap VFOs: "));Serial.println(*swap_vfo);
             return 1;
         }
         if (!strcmp(S_Input, "FR0")) // Split OFF
