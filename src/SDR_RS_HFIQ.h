@@ -25,8 +25,10 @@ class SDR_RS_HFIQ
         void        send_variable_cmd_to_RSHFIQ(const char * str, char * cmd_str);
         char *      convert_freq_to_Str(uint32_t freq);
         void        send_fixed_cmd_to_RSHFIQ(const char * str);
-        uint32_t    find_new_band(uint32_t new_frequency, uint8_t * rs_curr_band);
-        void        print_RSHFIQ(int flag);
+        uint32_t    find_new_band(uint32_t new_frequency, uint8_t * rs_curr_band);  // Validate frequency is RS-HFIQ comtaptible and retured band and frequency
+                                                                                    // If freq is out of RS-HFIQ band then the freq returned is 0;
+        void        print_RSHFIQ(int flag);  // reads response from RS-HFIQ and prints to the CAT terminal
+        void        print_RSHFIQ_User(int flag);  // reads response from RS-HFIQ and prints to the user terminal
         
     private:  
         char freq_str[15] = "7074000";  // *Fxxxx command to set LO freq, PLL Clock 0
