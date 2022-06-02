@@ -8,7 +8,7 @@
 //    Adds commands to test set and query for the RS-HFIQ transceiver via the Teensy 4.x USB Host serial port.
 //
 //    NOTE: Configure your terminal to send CR at end of line.  
-//    NOTE:  This program does not use the library yet. This is the predecessor to the library version.
+//    NOTE:  This program does not use the library. This is the predecessor to the library version.
 //
 //***************************************************************************************************
 #include "USBHost_t36.h"
@@ -66,7 +66,7 @@ void setup()
     int blocking = 1;
     
     while (!Serial && (millis() < 5000)) ; // wait for Arduino Serial Monitor
-    Serial.println("\n\nUSB Host Testing - Serial V0.1");
+    Serial.println("\n\nUSB Host Testing - Serial V0.2");
     RSHFIQ.begin();
     delay(50);
     Serial.println("Waiting for RS-HFIQ device to register on USB Host port");
