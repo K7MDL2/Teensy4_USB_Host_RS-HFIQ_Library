@@ -15,7 +15,7 @@ Contains 2 Arduino terminal program examples to do all commands the RS-HFIQ supp
   a. SDR_RSHFIQ_.ino was the test program used to figure out how it all worked and is self-contained.  It does not use the library.
   b. SDR_RSHFIQ_Lib.ino shows how to use the library and does the same thing as the non-library version.
 
-In theory this should also permit control via Omni-Rig2 interface from PC or Linux SDR programs because the serial interface will accept all commands in the same format the RS-HFIQ accepts. (Not tested yet)
+In theory this should also permit control via Omni-Rig1 and 2 interface from PC or Linux SDR programs because the serial interface will accept all commands in the same format the RS-HFIQ accepts. (Not tested yet).  Omni-Rig1 seems to work best so far for me.
 
 This version uses an internal band map table that ensures any serial terminal request frequency is within the band limits.  Invalid requests are ignored and returns a value of 0 to the caller.  Otherwise it returns the new valid frequency and a band number.  The band number is useful for forcing updates on band changes when multiple VFOs are involved.  Can do your own band number lookup based on the returned frequency and ignore the one supplied. 
 
